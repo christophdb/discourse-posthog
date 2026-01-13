@@ -30,11 +30,14 @@ after_initialize do
     # Skript nur einfügen, wenn das Plugin in den Einstellungen aktiviert ist
     next "" unless SiteSetting.posthog_identify_enabled
 
-    # ctx ist in diesem Fall der Controller-Kontext, der die Nonce bereitstellt
-    nonce = ctx.helpers.content_security_policy_nonce
+    # In Discourse 2026 ist dies der sicherste Weg, die Nonce abzugreifen
+    nonce = ctx.request.env['discourse.csp_nonce']
+
+    # Baue das Attribut-Fragment: Wenn nonce da ist -> 'nonce="xyz"', sonst leerer String
+    nonce_attr = nonce.present? ? " nonce=\"#{nonce}\"" : ""
 
     <<~HTML
-      <script nonce="#{nonce}">
+      <script#{nonce_attr}>
         !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init rs ls yi ns us ts ss capture Hi calculateEventProperties vs register register_once register_for_session unregister unregister_for_session gs getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty fs ds createPersonProfile ps Qr opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing hs debug O cs getPageViewId captureTraceFeedback captureTraceMetric Kr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
         posthog.init('phc_vIGSYAtCGptrMnB49dtq3PUZi21ivYsWaHQOiDlpF8Z', {
             api_host: 'https://ph.seatable.com',
