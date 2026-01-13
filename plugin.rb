@@ -30,10 +30,12 @@ after_initialize do
     # Skript nur einfügen, wenn das Plugin in den Einstellungen aktiviert ist
     next "" unless SiteSetting.posthog_identify_enabled
 
-    # In Discourse 2026 ist dies der sicherste Weg, die Nonce abzugreifen
-    nonce = ctx.request.env['discourse.csp_nonce']
+    # Sicherster Weg in 2026: Zugriff über die ContentSecurityPolicy Klasse
+    nonce = InlineContentSecurityPolicy.nonce
 
-    # Baue das Attribut-Fragment: Wenn nonce da ist -> 'nonce="xyz"', sonst leerer String
+    # Falls das fehlschlägt, versuchen wir den Helper-Kontext
+    nonce ||= ctx.helpers.content_security_policy_nonce if ctx.helpers.respond_to?(:content_security_policy_nonce)
+
     nonce_attr = nonce.present? ? " nonce=\"#{nonce}\"" : ""
 
     <<~HTML
