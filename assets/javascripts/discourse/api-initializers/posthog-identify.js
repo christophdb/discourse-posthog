@@ -14,7 +14,11 @@ export default apiInitializer("1.15.0", (api) => {
       ajax("/posthog/identify", { type: "POST" })
         .then((data) => {
           // Hier PostHog Logik einfügen
-          // posthog.identify(data.id, { email: data.email });
+          posthog.identify(data.email, { 
+            email: data.email ,
+            id: data.id,
+            username: data.username
+          });
 
           // Markierung setzen, damit der Request nicht erneut feuert
           sessionStorage.setItem(storageKey, "true");
