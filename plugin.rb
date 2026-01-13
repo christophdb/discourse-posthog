@@ -1,4 +1,4 @@
-# name: discourse-posthog
+# name: discourse-posthog-identify
 # about: PostHog identify endpoint for Discourse
 # version: 1.0.0
 # authors: Christoph Dyllick-Brenzinger
