@@ -1,7 +1,6 @@
-posthog:
-  posthog_identify_enabled:
-    default: true
-    client: true
+discourse_posthog:
+  enable_discourse_posthog_plugin:
+    default: false
   posthog_api_host:
     default: "https://eu.i.posthog.com"
     client: true
@@ -14,16 +13,31 @@ posthog:
     default: ""
     client: true
     type: string
+  posthog_identify_user_by:
+    client: true
+    default: "Email (hashed)"
+    type: enum
+    choices:
+      - "No User Identification"
+      - "Email"
+      - "Email (hashed)"
 
-posthog_features:
-  posthog_disable_surveys:
+#######################################
+########## Posthog Features ###########
+#######################################
+  posthog_feature_disable_surveys:
     default: true
     client: true
-  posthog_disable_session_recording:
+  posthog_feature_disable_session_recording:
     default: true
     client: true
-
-posthog_advanced:
-  posthog_hash_email:
+  posthog_feature_disable_session_recording_heatmaps:
     default: true
     client: true
+  posthog_cookie_expiration_in_days:
+    default: 90
+  posthog_api_version:
+    default: "2025-11-30"
+    type: enum
+    choices:
+      - "2025-11-30"

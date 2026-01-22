@@ -8,7 +8,7 @@ module DiscoursePosthog
     def status
       render json: {
                status: true,
-               posthog_enabled: SiteSetting.posthog_identify_enabled,
+               posthog_enabled: SiteSetting.enable_discourse_posthog_plugin,
              },
              content_type: "application/json"
     end

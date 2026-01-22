@@ -24,9 +24,9 @@ export default apiInitializer((api) => {
       ajax("/discourse-posthog/identify", { type: "POST" })
         .then((data) => {
           posthog.identify(data.email, {
-            email: data.email,
-            id: data.id,
-            username: data.username,
+            discourse_email: data.email,
+            discourse_id: data.id,
+            discourse_username: data.username,
           });
           sessionStorage.setItem(storageKey, "true");
           console.debug("🦔 Posthog Identify send");
@@ -50,8 +50,8 @@ export default apiInitializer((api) => {
       // Nur tracken, wenn es ein neues Topic ist (nicht beim Scrollen durch Posts)
       if (currentTopicId !== lastTopicId) {
         posthog.capture("$pageview", {
-          topic_id: currentTopicId,
-          title,
+          discourse_topic_id: currentTopicId,
+          discourse_title: title,
           url,
         });
         lastTopicId = currentTopicId;
@@ -65,51 +65,38 @@ export default apiInitializer((api) => {
     }
   });
 
-  // ✅ Topic Creation Events
-  api.onAppEvent("topic:created", (topicData) => {
+  // ✅ EVENT Tracking
+  api.onAppEvent("topic:created", (data) => {
     posthog.capture("discourse_topic_created", {
-      topic_id: topicData.topic_id,
-      topic_title: topicData.title,
+      discourse_topic_id: data.topic_id,
+      discourse_title: data.title,
+      discourse_slug: data.slug,
     });
     console.debug("🦔✅ Posthog event discourse_topic_created");
   });
 
-  api.onAppEvent("post:created", (topicData) => {
-    console.log(topicData);
-    posthog.capture("discourse_topic_answered", {
-      topic_id: topicData.topic_id,
+  api.onAppEvent("post:created", (data) => {
+    console.log(data);
+    posthog.capture("discourse_post_created", {
+      discourse_topic_id: data.topic_id,
+      discourse_slug: data.slug,
     });
-    console.debug("🦔✅ Posthog event discourse_topic_answered");
+    console.debug("🦔✅ Posthog event discourse_post_created");
   });
 
-  // hier entwickel ich gerade
-  console.log("lets dev");
+  api.onAppEvent("page:like-toggled", (data) => {
+    const topicId = data.post_url.match(/\/t\/[^\/]+\/(\d+)\//)?.[1] || 0;
 
-  // der folgende code geht nicht...
-
-  // 3. LIKE Tracking
-  // ✅ DOM Event Delegation für Like Buttons
-  api.onAppEvent("post-actions:liked", (data) => {
-    console.debug("LIKE");
-
-    window.posthog?.capture("post_liked", {
-      post_id: data.id,
-      topic_id: data.topicId,
-    });
-  });
-
-  // 🔥 DISCOURSE 2026 NEUESTE FEATURES - Event Hooks
-  // 1. TOPIC ERSTELLUNG (neueste Discourse TopicCreatedEvent)
-  /*
-  api.addModelClassCallback('topic', {
-    afterCreate(topic) {
-      posthog.capture('topic_created', {
-        topic_id: topic.id,
-        title: topic.title,
-        category_id: topic.category_id
+    if (data.actionByName?.like?.acted) {
+      posthog.capture("discourse_post_liked", {
+        discourse_topic_id: topicId,
       });
-      console.log('capture: discourse_topic_created')
+      console.debug("🦔✅ Posthog event discourse_post_liked");
+    } else {
+      posthog.capture("discourse_post_unliked", {
+        discourse_topic_id: topicId,
+      });
+      console.debug("🦔✅ Posthog event discourse_post_unliked");
     }
   });
-  */
 });

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 # name: discourse-posthog
-# about: Track pageviews, events in Posthog. Registers a POST-endpoint for PostHog user identification.
+# about: PostHog Analytics Integration. Captures pageviews, topic/post creation, likes/unlikes. Supports anonymous or identified user tracking via server-side identify endpoint.
 # version: 0.3
 # authors: Christoph Dyllick-Brenzinger
 # url: https://github.com/christophdb/discourse-posthog
 
-enabled_site_setting :posthog_identify_enabled
+enabled_site_setting :enable_discourse_posthog_plugin
 
 after_initialize do
   require_relative "app/controllers/discourse_posthog/endpoint_controller"
@@ -18,7 +18,7 @@ after_initialize do
 
   register_html_builder("server:before-head-close") do |controller|
     # Skript nur einfügen, wenn das Plugin in den Einstellungen aktiviert ist
-    next "" unless SiteSetting.posthog_identify_enabled
+    next "" unless SiteSetting.enable_discourse_posthog_plugin
 
     # Variablen aus den SiteSettings ziehen
     api_host = SiteSetting.posthog_api_host
@@ -40,7 +40,7 @@ after_initialize do
           capture_pageleave: true,
           person_profiles: 'identified_only',
           // pageviews are deactivated, otherwise multiple pageviews per topic /t/topic/5690 und /t/topic/5690/4
-          capture_pageview: true,
+          capture_pageview: false,
       });
     </script>
     HTML
