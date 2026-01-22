@@ -25,7 +25,7 @@ after_initialize do
     feature_disable_surveys = SiteSetting.posthog_feature_disable_surveys
     feature_disable_session_recording = SiteSetting.posthog_feature_disable_session_recording
     cookie_expiration_in_days = SiteSetting.posthog_cookie_expiration_in_days
-    api_version = SiteSetting.api_version
+    api_version = SiteSetting.posthog_api_version
 
     <<~HTML
     <script nonce='#{controller.helpers.csp_nonce_placeholder}'>

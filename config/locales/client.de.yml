@@ -3,4 +3,4 @@ en:
     admin:
       site_settings:
         categories:
-          discourse_github: "Discourse Posthog"
+          discourse_posthog: "Discourse Posthog"

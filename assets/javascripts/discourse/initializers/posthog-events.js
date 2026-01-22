@@ -16,7 +16,7 @@ export default apiInitializer((api) => {
   console.debug("🦔 PostHog Initializer gestartet");
 
   // 1. user identification
-  if (currentUser && identifyMethod !== "No User Identification" ) {
+  if (currentUser && identifyMethod !== "No User Identification") {
     const storageKey = `posthog_identified_${currentUser.id}`;
     console.debug(
       "🦔 PostHog Identify started. Current storageKey:",
@@ -27,7 +27,8 @@ export default apiInitializer((api) => {
     if (!sessionStorage.getItem(storageKey)) {
       ajax("/discourse-posthog/identify", { type: "POST" })
         .then((data) => {
-          const identify_with = identifyMethod === "Email" ? data.email : data.hashed_email; 
+          const identify_with =
+            identifyMethod === "Email" ? data.email : data.hashed_email;
           console.debug("Identify with", identify_with);
 
           posthog.identify(identify_with, {

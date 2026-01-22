@@ -1,16 +1,18 @@
 # Discourse PostHog
 
-Enables PostHog `identify()` calls **with email as distinct_id** after login.
+This plugin integrates Discourse with PostHog, sending events like pageviews, topic/post creation, and likes. It supports anonymous tracking, email-based identification, or SHA256-hashed emails via a custom Discourse endpoint.
 
 ## Features
 
-- Server-side email proxy (`/posthog/identify`)
-- GDPR compliant (only own email)
-- Works with SSO + standard accounts
+- **Events**: pageview, pageleave, create topic, create post, like/unlike post
+- **Privacy levels of the event tracking**: anonymous, user email, hashed email
 
-## Installation
+## Production Installation
 
-**Edit `containers/app.yml`:**
+### 1. Load plugin
+
+Edit `containers/app.yml` and add this code:
+
 
 ```yaml
 hooks:
@@ -19,21 +21,65 @@ hooks:
         cd: $home/plugins
         cmd:
           # ... existing plugins ...
-          - git clone https://github.com/christophdb/discourse-posthog-identify.git
+          - git clone https://github.com/christophdb/discourse-posthog.git
 ```
 
-## ToDo
+### 2. Rebuild container
 
-- [x] CSP kann nicht aktiviert werden. => nonce wird nun richtig gesetzt
-- [x] Discourse ist ein SPA (single page application) und die url ändert sich beim scrollen.
-- [ ] Tracken von Likes im Forum (vielleicht per api.onAppEvent)
-- [ ] Tracken von neuen / beantworteten Topics
-- [ ] Hashen der email
+```bash
+cd /var/discourse
+./launcher rebuild app
+```
 
-## My Local Development Setup
+### 3. Enable plugin
 
-https://meta.discourse.org/t/developing-discourse-plugins-part-1-create-a-basic-plugin/30515?silent=true
+- Go to `Admin` → `Plugins` → Enable "discourse-posthog"
+- Add your POSTHOG_API_KEY. Update the other settings, if needed.
 
-lokalen dev container starten...
+### 4. Verify
 
-bundle exec rake admin:create
+Open the browser console and change the output to `verbose`. Now you will see log message from the plugin.
+
+```bash
+🦔 PostHog Initializer gestartet
+🦔✅ Posthog $pageview capture for a page
+```
+
+## Local Development (VSCode DevContainer)
+
+### Workspace Setup
+
+```
+mkdir discourse-dev && cd discourse-dev
+git clone https://github.com/christophdb/discourse-posthog.git
+git clone https://github.com/discourse/discourse.git
+code discourse
+```
+
+### Directory structure:
+
+```
+discourse-dev/
+├── discourse/           ← Discourse Core (workspaceMount)
+└── discourse-posthog/   ← Plugin (separate mount)
+```
+
+### Extend .devcontainer/devcontainer.json
+
+```bash
+"source=${localWorkspaceFolder}/../discourse-posthog,target=${containerWorkspaceFolder}/plugins/discourse-posthog,type=bind,consistency=cached"
+```
+
+### Start sequence
+
+Inside visual studio code, start the dev container. You will find the plugin in `plugins/discourse-posthog`.
+
+Open your browser and open `http://localhost:4200`.
+
+### Initial Admin User
+
+After the first start of discourse you need to create an initial admin user with `bundle exec rake admin:create`.
+
+### Development
+
+The Mount ensures local plugin changes are immediately visible in container.
