@@ -5,7 +5,7 @@
 # url: https://github.com/christophdb/discourse-posthog
 
 # Development Mode
-if ENV['LOCAL_DISCOURSE_PLUGINS'] == "true"
+if ENV['LOCAL_DISCOURSE_PLUGINS']
   Rails.logger.info "🚀 PostHog Plugin: Hot-Reload Mode aktiv!"
 end
 
