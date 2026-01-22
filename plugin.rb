@@ -4,10 +4,9 @@
 # authors: Christoph Dyllick-Brenzinger
 # url: https://github.com/christophdb/discourse-posthog
 
-# Activate Developemnt Mode
-if ENV['DISCOURSE_DEV'] || Rails.env.development?
-  PRELOAD_PLUGINS = false
-  DiscoursePluginRegistry.development_mode = true
+# Development Mode
+if ENV['LOCAL_DISCOURSE_PLUGINS'] == "true"
+  Rails.logger.info "🚀 PostHog Plugin: Hot-Reload Mode aktiv!"
 end
 
 enabled_site_setting :posthog_identify_enabled
@@ -55,7 +54,7 @@ after_initialize do
           autocapture: false,
           capture_pageleave: false,
           person_profiles: 'identified_only',
-          // pageviews are deactivated, otherwise multiple payviews per topic /t/topic/5690 und /t/topic/5690/4
+          // pageviews are deactivated, otherwise multiple pageviews per topic /t/topic/5690 und /t/topic/5690/4
           capture_pageview: false,
       });
     </script>
