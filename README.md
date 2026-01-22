@@ -34,13 +34,13 @@ cd /var/discourse
 ### 3. Enable plugin
 
 - Go to `Admin` → `Plugins` → Enable "discourse-posthog"
-- Add your POSTHOG_API_KEY. Update the other settings, if needed.
+- Add your `POSTHOG_API_KEY`. Update the other settings, if needed.
 
 ### 4. Verify
 
 Open the browser console and change the output to `verbose`. Now you will see log message from the plugin.
 
-```bash
+```
 🦔 PostHog Initializer gestartet
 🦔✅ Posthog $pageview capture for a page
 ```
@@ -49,7 +49,7 @@ Open the browser console and change the output to `verbose`. Now you will see lo
 
 ### Workspace Setup
 
-```
+```bash
 mkdir discourse-dev && cd discourse-dev
 git clone https://github.com/christophdb/discourse-posthog.git
 git clone https://github.com/discourse/discourse.git
